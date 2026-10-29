@@ -1,7 +1,3 @@
 #!/bin/bash
-# Chạy migrate database tự động mỗi khi container khởi động
-php artisan migrate --force
-
-php artisan db:seed --force
-# Khởi động Apache ở Foreground để giữ container luôn chạy
+php artisan migrate:fresh --seed --force
 apache2-foreground

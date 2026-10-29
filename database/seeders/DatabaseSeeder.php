@@ -3,8 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use BannerSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use ProductSeeder;
+use SizeSeeder;
 
 class DatabaseSeeder extends Seeder
 {
