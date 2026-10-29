@@ -1,0 +1,322 @@
+================================================================================
+  FOOD-SG API — ROUTE + JSON RESPONSE (tài liệu cho FRONTEND)
+  Cập nhật: 2026-10-19 | Laravel 13 | JWT | Base URL: {host}/api
+================================================================================
+
+--------------------------------------------------------------------------------
+0. QUY ƯỚC CHUNG
+--------------------------------------------------------------------------------
+- Tất cả request/response: Content-Type: application/json (trừ GET không cần body)
+- Định danh: header
+      Authorization: Bearer <token>
+  (token lấy từ POST /api/auth/login, hết hạn sau 3600 giây)
+- Field: snake_case. Thời gian: ISO8601, ví dụ "2026-10-20T00:00:00.000000Z"
+- Không cần token: mọi route "GUEST" (public, SEO friendly — danh mục/sản phẩm theo slug)
+- Cần token + role admin: mọi route "/api/admin/*" (user phải gắn staff, staff.role = admin)
+- Cần token + role warehouse|sales: GET /api/staff/profile
+
+  Mã trạng thái thường gặp:
+    200  thành công (GET / PUT / DELETE)
+    201  tạo thành công (POST) — response đã bọc { "data": ... }
+    401  { "message": "Unauthenticated." }                 — thiếu/hết token
+    403  { "message": "Bạn không có quyền thực hiện thao tác này." }
+    404  { "message": "Không tìm thấy sản phẩm." }         — message theo từng route
+    422  { "message": "...", "errors": { "field": ["msg"] } } — lỗi validate
+    429  { "message": "Too Many Attempts." }               — login quá 5 lần/phút
+
+--------------------------------------------------------------------------------
+1. OBJECT THAM CHIẾU (dùng chung)
+--------------------------------------------------------------------------------
+
+--- Product ---
+{
+  "id": 1,
+  "name": "Phở bò",
+  "slug": "pho-bo",
+  "price": 100000,                 // số nguyên (int)
+  "sale_price": 80000,             // int | null
+  "sale_start_at": "2026-10-20T00:00:00.000000Z",  // string | null
+  "sale_end_at": "2026-10-31T00:00:00.000000Z",    // string | null
+  "category_id": 1,
+  "meta_title": null,              // string | null
+  "meta_description": null,
+  "meta_keyword": null,
+  "created_at": "...", "updated_at": "...",
+  "category": { ...Category... },  // LUÔN có ở mọi endpoint của product
+  "sizes": [ ...Size... ],         // CHỈ có ở DETAIL (GET .../{slug} và admin show)
+  "ingredients": [ ...Ingredient... ],
+  "stock": { ...Stock... } | null  // null nếu chưa có bản ghi kho
+  "stocks": [ ...Stock... ]         // tồn kho theo từng cửa hàng (CHỈ có ở DETAIL)
+}
+  + sizes / ingredients / stocks: chỉ xuất hiện ở detail — có thể là [] nếu rỗng.
+  + "stock" (bản ghi đơn) = null nếu sản phẩm có tồn kho ở nhiều cửa hàng.
+  + GET /api/products?store_id=X chỉ trả stocks của cửa hàng X.
+
+--- Category ---
+{
+  "id": 1, "name": "Món chính", "slug": "mon-chinh",
+  "meta_title": null, "meta_description": null, "meta_keyword": null,
+  "created_at": "...", "updated_at": "...",
+  "products_count": 12,            // KHÔNG có ở response POST create và /api/search
+  "products": [ ...Product... ]    // CHỈ có ở GET /api/categories/{slug} (tối đa 50 sp mới nhất)
+}
+
+--- Size ---       { "id":1, "name":"Nhỏ", "created_at":"...", "updated_at":"..." }
+--- Ingredient --- { "id":1, "name":"Bò",  "created_at":"...", "updated_at":"..." }
+--- Store ---      { "id":1, "name":"...", "address":"...", "created_at":"...", "updated_at":"..." }
+--- Stock ---      { "id":1, "product_id":1, "store_id":1, "staff_id":2, "quantity":50,
+                    "created_at":"...", "updated_at":"...", "store": { ...Store... } }
+
+--- User (chỉ các route auth) ---
+{
+  "id": 1, "name": "Admin", "email": "admin@...",
+  "email_verified_at": null, "created_at": "...", "updated_at": "...",
+  "staff": {
+    "id": 1, "name": "...", "user_id": 1, "store_id": 1, "role_id": 1,
+    "created_at": "...", "updated_at": "...",
+    "store": { ...Store... } | null,
+    "role":  { "id":1, "name":"Quản trị", "slug":"admin", "created_at":"...", "updated_at":"..." } | null
+  } | null                          // null nếu user chưa gắn staff
+}
+
+--- Phân trang (mọi danh sách có trang) ---
+{
+  "data": [ ...object... ],
+  "links": { "first":"...", "last":"...", "prev": "..."|null, "next":"..."|null },
+  "meta": {
+    "current_page": 1, "from": 1, "last_page": 3, "per_page": 12, "to": 12, "total": 34,
+    "path": "http://host/api/products",
+    "links": [ { "url":"...", "label":"« Previous", "page":null, "active":false }, ... ]
+  }
+}
+  Đọc tổng số: meta.total — trang hiện tại: meta.current_page.
+
+--------------------------------------------------------------------------------
+2. AUTH
+--------------------------------------------------------------------------------
+
+[POST] /api/auth/login                                (không cần token, throttle 5 lần/phút)
+  Body: { "email": "a@b.com", "password": "secret123" }
+  → 200:
+     {
+       "token": "eyJhbGciOi...",
+       "token_type": "bearer",
+       "expires_in": 3600,
+       "user": { ...User... }
+     }
+  → 422 thiếu sai định dạng: errors.email / errors.password
+  → 422 sai mật khẩu: { "message": "...", "errors": { "email": ["Thông tin đăng nhập không đúng."] } }
+
+[GET]  /api/auth/me                                   (token)
+  → 200: { "user": { ...User... } }
+
+[POST] /api/auth/logout                               (token)
+  → 200: { "message": "Đăng xuất thành công." }       (token ngay sau đó hết hạn)
+
+[GET]  /api/staff/profile                             (token + role warehouse|sales)
+  → 200: { "user": { ...User... } }
+  → 403 nếu role là admin
+
+--------------------------------------------------------------------------------
+3. GUEST — SẢN PHẨM (public, SEO)
+--------------------------------------------------------------------------------
+
+[GET] /api/products
+  Query: category = slug danh mục (optional)
+         store_id = id cửa hàng (optional) — chỉ trả sản phẩm + tồn kho của cửa hàng đó
+         per_page = 1..50, mặc định 12 (optional)
+         page     >= 1 (optional)
+  → 200 phân trang: data = [ { ...Product có category... } ]
+  Ví dụ lọc: GET /api/products?category=mon-chinh&page=1&per_page=12
+  Ví dụ lọc: GET /api/products?store_id=1
+
+[GET] /api/products/{slug}
+  Query: store_id = id cửa hàng (optional) — chỉ trả tồn kho của cửa hàng đó
+  → 200: { "data": { ...Product đầy đủ: category + sizes + ingredients + stocks... } }
+  → 404: { "message": "Không tìm thấy sản phẩm." }
+
+--------------------------------------------------------------------------------
+4. GUEST — DANH MỤC
+--------------------------------------------------------------------------------
+
+[GET] /api/categories
+  → 200: { "data": [ { ...Category + products_count... } ] }        (KHÔNG phân trang)
+
+[GET] /api/categories/{slug}
+  → 200: { "data": { ...Category + products_count + products[ tối đa 50 ]... } }
+  → 404: { "message": "Không tìm thấy danh mục." }
+
+--------------------------------------------------------------------------------
+5. GUEST — SIZE / NGUYÊN LIỆU / CỬA HÀNG
+--------------------------------------------------------------------------------
+
+[GET] /api/sizes                → 200 { "data": [ ...Size... ] }
+[GET] /api/sizes/{id}           → 200 { "data": { ...Size... } }     404: "Không tìm thấy size."
+[GET] /api/ingredients          → 200 { "data": [ ...Ingredient... ] }
+[GET] /api/ingredients/{id}     → 200 { "data": { ...Ingredient... } } 404: "Không tìm thấy nguyên liệu."
+[GET] /api/stores               → 200 { "data": [ ...Store... ] }
+[GET] /api/stores/{id}          → 200 { "data": { ...Store... } }    404: "Không tìm thấy cửa hàng."
+[GET] /api/stores/{id}/products → 200 { "store": { ...Store... },
+                                          "products": [ { ...Stock + product... } ] }  (chỉ sp còn tồn > 0)
+   (id bắt buộc là số — truyền chữ sẽ 404)
+
+--------------------------------------------------------------------------------
+6. GUEST — TÌM KIẾM
+--------------------------------------------------------------------------------
+
+[GET] /api/search?q=pho
+  Query: q = bắt buộc, 2..100 ký tự (tự trim khoảng trắng)
+  → 200:
+     {
+       "query": "pho",
+       "products":   [ ...Product (có category), tối đa 20, mới nhất... ],
+       "categories": [ ...Category, tối đa 20... ]
+     }
+  → 422 nếu thiếu/không hợp lệ: errors.q
+
+--------------------------------------------------------------------------------
+7. ADMIN — SẢN PHẨM                                    (token + role admin)
+--------------------------------------------------------------------------------
+
+[GET] /api/admin/products
+  Query: q = từ khóa lọc theo name/slug (optional, trim)
+         category_id = lọc theo danh mục (optional, số)
+  → 200 phân trang (15/trang): data = [ ...Product có category... ]
+
+[GET] /api/admin/products/search?q=pho
+   Query: q = bắt buộc, 1..100 ký tự
+   → 200 (KHÔNG phân trang, tối đa 50): { "data": [ ...Product... ] }
+   → 422 nếu thiếu q
+
+[POST] /api/admin/products
+   Body (create):
+     name          required, <= 255
+     price         required, số >= 0 (int)
+     category_id   required, id danh mục tồn tại
+     sale_price    optional, số >= 0, null
+     sale_start_at optional, date
+     sale_end_at   optional, date, >= sale_start_at
+     slug          optional — bỏ trống sẽ TỰ SINH từ name (unique; truyền trùng → 422 errors.slug)
+     meta_title / meta_keyword  optional, <= 255
+     meta_description           optional, <= 1000
+   → 201: { "data": { ...Product + category... } }
+   → 422: errors theo từng field (vd thiếu price, sale_end_at trước sale_start_at, category_id không tồn tại)
+
+[GET] /api/admin/products/{id}
+   → 200: { "data": { ...Product + category + sizes + ingredients + stocks... } }   (id là số)
+   (Query store_id = id cửa hàng (optional) — chỉ trả stocks của cửa hàng đó)
+
+[PUT|PATCH] /api/admin/products/{id}
+   Body: partial — chỉ cần gửi field cần sửa (name giữ nguyên nếu không gửi;
+         nếu có gửi name mà không gửi slug thì slug cũng tự sinh lại cho đúng)
+   → 200: { "data": { ...Product + category... } }
+
+[DELETE] /api/admin/products/{id}
+   → 200: { "message": "Đã xóa sản phẩm." }
+   (SOFT DELETE: sản phẩm, nhân viên (staff) liên quan và user gắn staff sẽ bị ẩn; stock giữ lại; có thể khôi phục)
+
+[POST] /api/admin/products/{product}/restore
+   → 200: { "data": { ...Product + category + sizes + ingredients + stocks... } }
+   (khôi phục sản phẩm, staff và user liên quan)
+
+[DELETE] /api/admin/products/{product}/force
+   → 200: { "message": "Đã xóa sản phẩm vĩnh viễn." }
+   (XÓA VĨNH VIỄN; không thể khôi phục)
+
+--------------------------------------------------------------------------------
+8. ADMIN — DANH MỤC                                     (token + role admin)
+--------------------------------------------------------------------------------
+
+[GET]    /api/admin/categories            Query: q (optional) → 200 phân trang 15/trang
+[GET]    /api/admin/categories/search     Query: q bắt buộc   → 200 { "data": [...], tối đa 50 }
+[POST]   /api/admin/categories
+         Body: name required | slug optional (tự sinh) | meta_* optional
+         → 201 { "data": { ...Category KHÔNG có products_count... } }
+[GET]    /api/admin/categories/{id}       → 200 { "data": { ...Category + products_count } }
+[PUT]    /api/admin/categories/{id}       → 200 { "data": { ...Category + products_count } }
+[DELETE] /api/admin/categories/{id}       → 200 { "message": "Đã xóa danh mục." }
+         !! CẢNH BÁO: xóa danh mục sẽ XÓA CASCADE toàn bộ sản phẩm thuộc danh mục đó.
+
+--------------------------------------------------------------------------------
+9. ADMIN — SIZE / NGUYÊN LIỆU / CỬA HÀNG                   (token + role admin)
+--------------------------------------------------------------------------------
+
+Cú pháp giống nhau cho 3 resource: sizes, ingredients, stores
+
+[GET]    /api/admin/{resource}            Query: q (optional) → 200 phân trang 15/trang
+[GET]    /api/admin/{resource}/search     Query: q bắt buộc   → 200 { "data": [...], tối đa 50 }
+[POST]   /api/admin/{resource}
+           sizes/ingredients: { "name": "..." }                 required
+           stores:            { "name": "...", "address": "..." } required (cả 2)
+         → 201 { "data": object }
+[GET]    /api/admin/{resource}/{id}       → 200 { "data": object }
+[PUT]    /api/admin/{resource}/{id}       → 200 { "data": object }   (partial, field optional)
+[DELETE] /api/admin/{resource}/{id}       → 200:
+           sizes        { "message": "Đã xóa size." }
+           ingredients  { "message": "Đã xóa nguyên liệu." }
+           stores       { "message": "Đã xóa cửa hàng." }
+         !! stores: xóa cửa hàng sẽ xóa nhân viên (staff) thuộc cửa hàng đó — cần confirm phía FE/admin.
+
+   resource: sizes | ingredients | stores
+
+[GET] /api/admin/stores/{id}/products          (token + role admin)
+   → 200 phân trang 15/trang: { "data": [ { ...Stock + product + store... } ] }
+   (danh sách sản phẩm + tồn kho đang phục vụ tại cửa hàng này)
+
+--------------------------------------------------------------------------------
+9b. KHO — TỒN KHO THEO CỬA HÀNG                  (token + role theo phạm vi store)
+--------------------------------------------------------------------------------
+
+QUY TẮC PHẠM VI:
+  - role warehouse / sales: CHỈ thấy và thao tác tồn kho của CỬA HÀNG CỦA HỌ.
+    Gửi store_id của cửa hàng khác ⇒ 403 "Bạn không có quyền thao tác dữ liệu của cửa hàng khác."
+  - role admin: phạm vi toàn hệ thống, được lọc theo store_id (tuỳ chọn).
+  - Ghi (POST/PUT/DELETE) chỉ dành cho warehouse + admin; sales chỉ được ĐỌC.
+
+[GET] /api/stock                                (token + role sales|warehouse|admin)
+  Query: store_id (optional — chỉ admin dùng được để lọc cửa hàng khác)
+         product_id (optional)
+         q = từ khoá theo tên/slug sản phẩm (optional)
+  → 200 phân trang 15/trang: { "data": [ { ...Stock + product + store + staff... } ] }
+  (warehouse/sales: luôn bị lọc theo cửa hàng của mình)
+
+[GET] /api/stock/{id}                           (token + role sales|warehouse|admin)
+  → 200: { "data": { ...Stock + product + store + staff... } }
+  → 403 nếu bản ghi thuộc cửa hàng khác (với warehouse/sales)
+
+[POST] /api/stock                               (token + role warehouse|admin)
+  Body: product_id required (tồn tại)
+        quantity   required, số nguyên >= 0
+        store_id   optional (chỉ admin dùng; warehouse bị ghim vào cửa hàng của mình)
+        staff_id   optional (chỉ admin dùng; phải thuộc đúng cửa hàng đó)
+  → 201: { "data": { ...Stock + product + store + staff... } }
+  (UPSERT theo cặp product_id + store_id — tồn tại thì cập nhật quantity)
+  → 403 nếu warehouse cố ghi vào cửa hàng khác
+  → 422 nếu staff_id không thuộc cửa hàng đang chọn
+
+[PUT] /api/stock/{id}                           (token + role warehouse|admin)
+  Body: quantity required | product_id optional | staff_id optional (chỉ admin)
+  → 200: { "data": { ...Stock + product + store + staff... } }
+  → 403 nếu bản ghi thuộc cửa hàng khác (với warehouse)
+
+[DELETE] /api/stock/{id}                        (token + role warehouse|admin)
+  → 200: { "message": "Đã xóa bản ghi tồn kho." }
+  → 403 nếu bản ghi thuộc cửa hàng khác (với warehouse)
+
+--------------------------------------------------------------------------------
+10. GHI CHÚ
+--------------------------------------------------------------------------------
+- Cache: các endpoint GUEST (list/detail/search) được cache ~5 phút.
+  Sau khi admin tạo/sửa/xóa, cache tự xóa → FE gọi lại là thấy dữ liệu mới ngay.
+- Danh sách admin luôn cố định per_page = 15 (không nhận param per_page).
+- Danh sách GUEST chỉ /api/products nhận per_page/page; các list còn lại trả full (không trang).
+- Form validate chưa có message tiếng Việt riêng (mặc định của framework) — nếu FE
+  cần bản dịch có thể map theo field name trong errors.
+- Xóa size / ingredient sẽ xóa luôn liên kết của chúng với sản phẩm (bảng
+  product_size / product_ingredient) — không ảnh hưởng dữ liệu sản phẩm.
+- Slug SEO: FE nên dùng url  /products/{slug}  /categories/{slug}  (không dùng id).
+- Tồn kho là THEO CỬA HÀNG: mỗi (sản phẩm, cửa hàng) có 1 bản ghi product_stock.
+  Nhân viên kho chỉ thấy tồn kho cửa hàng mình; quản trị xem được toàn bộ.
+- Tài liệu business đầy đủ: docs/BUSINESS_OVERVIEW.md, docs/MODEL.md, docs/FLOWS.md,
+  docs/RULE.md, docs/PERMISS.md, docs/GLOSSARY.md
+================================================================================
