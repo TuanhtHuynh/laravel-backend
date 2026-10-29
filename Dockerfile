@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql zip gd
+# Cấp quyền ghi cho thư mục storage và bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Cài đặt Composer (trình quản lý gói của PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -33,5 +36,12 @@ RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-avail
 # Bật module rewrite của Apache cho Laravel Routes
 RUN a2enmod rewrite
 
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Mở cổng 80 cho web service
 EXPOSE 80
+
+# Sử dụng entrypoint script làm lệnh chạy mặc định khi container start
+CMD ["entrypoint.sh"]
+
