@@ -18,9 +18,11 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         if (! Auth::attempt($request->validated())) {
-            throw ValidationException::withMessages([
-                'email' => ['Thông tin đăng nhập không đúng.'],
-            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Thông tin đăng nhập không đúng.',
+                'errors' => ['email' => ['Thông tin đăng nhập không đúng.']],
+            ], 401);
         }
 
         $user = $this->user($request);
