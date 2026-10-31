@@ -2,6 +2,7 @@ FROM php:8.3-apache
 
 # Cài đặt các extension hệ thống cần thiết cho Laravel
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
