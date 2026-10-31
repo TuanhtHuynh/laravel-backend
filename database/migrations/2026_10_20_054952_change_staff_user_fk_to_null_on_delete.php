@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('staff', function (Blueprint $table) {
-            // Drop index unique trước để tương thích SQLite (drop column còn index sẽ lỗi).
-            $table->dropUnique(['user_id']);
-            $table->dropConstrainedForeignId('user_id');
+            // MySQL: phải drop foreign key trước khi drop index liên quan.
+            $table->dropForeign('staff_user_id_foreign');
+            $table->dropUnique('staff_user_id_unique');
+            $table->dropColumn('user_id');
             $table->foreignId('user_id')->nullable()->unique()->after('id')->constrained()->nullOnDelete();
         });
     }
