@@ -28,9 +28,6 @@ class DatabaseSeeder extends Seeder
             BannerImageSeeder::class,
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // User factory user removed; use UserSeeder instead.
     }
 }
