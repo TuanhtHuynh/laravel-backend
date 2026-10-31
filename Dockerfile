@@ -39,7 +39,7 @@ COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Mở cổng 80 cho web service
-EXPOSE 80
+RUN sed -ri -e 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 # Sử dụng entrypoint script làm lệnh chạy mặc định khi container start
 CMD ["entrypoint.sh"]
