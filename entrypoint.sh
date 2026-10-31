@@ -7,9 +7,12 @@ php artisan migrate --force
 echo "2. Đang cập nhật Composer Autoload..."
 composer dump-autoload --optimize
 
-echo "3. Đang chạy Seeder hệ thống (nếu cần)..."
+echo "3. Đang tạo Storage Link..."
+php artisan storage:link --force
+
+echo "4. Đang chạy Seeder hệ thống (nếu cần)..."
 # Thay 'DatabaseSeeder' bằng tên Seeder cụ thể của bạn để tránh ghi đè dữ liệu user
 php artisan db:seed --class=DatabaseSeeder --force
 
-echo "4. Khởi động Apache Server..."
+echo "5. Khởi động Apache Server..."
 exec apache2-foreground
