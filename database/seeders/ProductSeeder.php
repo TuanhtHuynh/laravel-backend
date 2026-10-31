@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Seeder;
 
@@ -8,6 +9,9 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        $cat14 = Category::firstOrCreate(['slug' => 'mon-chinh'], ['name' => 'Món chính']);
+        $cat15 = Category::firstOrCreate(['slug' => 'do-uong'], ['name' => 'Đồ uống']);
+
         $data = [
             [
                 'slug' => 'p2',
@@ -20,7 +24,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'pho-bo',
@@ -33,7 +37,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'grillded-beef',
@@ -46,7 +50,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'mi-trung-001',
@@ -59,7 +63,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'rice-ball',
@@ -72,7 +76,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'spicy-noodle',
@@ -85,7 +89,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'ot-chuong-thit',
@@ -98,7 +102,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'trai-cay-tuoi',
@@ -111,7 +115,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'ga-nuong',
@@ -124,7 +128,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'ca-kho-chien',
@@ -137,7 +141,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'mi-thit',
@@ -150,7 +154,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'soda-cream',
@@ -163,7 +167,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'com-trung-chien',
@@ -176,7 +180,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'canh-ga-chien',
@@ -189,7 +193,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'com-phan',
@@ -202,7 +206,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 15,
+                'category_id' => $cat15->id,
             ],
             [
                 'slug' => 'bo-ham',
@@ -215,7 +219,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
             [
                 'slug' => 'mi-spaghetti-pho-mai',
@@ -228,7 +232,7 @@ class ProductSeeder extends Seeder
                 'meta_title' => NULL,
                 'meta_description' => NULL,
                 'meta_keyword' => NULL,
-                'category_id' => 14,
+                'category_id' => $cat14->id,
             ],
         ];
 
