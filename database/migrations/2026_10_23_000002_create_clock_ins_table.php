@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('clock_ins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
-            $table->timestamp('clock_in')->nullable();
+            $table->timestamp('clock_in');
             $table->timestamp('clock_out')->nullable();
             $table->timestamps();
         });
