@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             BannerSeeder::class,
             ProductImageSeeder::class,
             BannerImageSeeder::class,
+            PageSeeder::class,
         ]);
 
         // User factory user removed; use UserSeeder instead.
