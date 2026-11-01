@@ -16,7 +16,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'p2',
                 'name' => 'Phở Gà',
-                'image' => '/storage/products/pho-chicken.jpg',
+                'image' => 'products/pho-chicken.jpg',
                 'price' => 45000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -29,7 +29,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'pho-bo',
                 'name' => 'Phở Bò',
-                'image' => '/storage/products/pho-bo.jpg',
+                'image' => 'products/pho-bo.jpg',
                 'price' => 45000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -42,7 +42,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'grillded-beef',
                 'name' => 'Thịt Nướng',
-                'image' => '/storage/products/thit-nuong.jpg',
+                'image' => 'products/thit-nuong.jpg',
                 'price' => 55000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -55,7 +55,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'mi-trung-001',
                 'name' => 'Mì Trứng',
-                'image' => '/storage/products/mi_trung_001.jpg',
+                'image' => 'products/mi_trung_001.jpg',
                 'price' => 55000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -68,7 +68,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'rice-ball',
                 'name' => 'Rice Ball',
-                'image' => '/storage/products/rice_ball.jpg',
+                'image' => 'products/rice_ball.jpg',
                 'price' => 55000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -81,7 +81,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'spicy-noodle',
                 'name' => 'Mì Cay',
-                'image' => '/storage/products/spicy.-noodle.jpg',
+                'image' => 'products/spicy.-noodle.jpg',
                 'price' => 55000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -94,7 +94,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'ot-chuong-thit',
                 'name' => 'Ớt Chuông Thịt',
-                'image' => '/storage/products/ot-chuong-thit.jpg',
+                'image' => 'products/ot-chuong-thit.jpg',
                 'price' => 100000,
                 'sale_price' => 60000,
                 'sale_start_at' => NULL,
@@ -107,7 +107,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'trai-cay-tuoi',
                 'name' => 'Trái Cây Tươi',
-                'image' => '/storage/products/trai-cay-tuoi.jpg',
+                'image' => 'products/trai-cay-tuoi.jpg',
                 'price' => 100000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -120,7 +120,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'ga-nuong',
                 'name' => 'Gà Nướng',
-                'image' => '/storage/products/ga-nuong.jpg',
+                'image' => 'products/ga-nuong.jpg',
                 'price' => 100000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -133,7 +133,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'ca-kho-chien',
                 'name' => 'Cá Khô Chiên',
-                'image' => '/storage/products/ca-kho-chien.jpg',
+                'image' => 'products/ca-kho-chien.jpg',
                 'price' => 100000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -146,7 +146,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'mi-thit',
                 'name' => 'Mì Thịt',
-                'image' => '/storage/products/mi-thit.jpg',
+                'image' => 'products/mi-thit.jpg',
                 'price' => 40000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -159,7 +159,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'soda-cream',
                 'name' => 'Soda Kem',
-                'image' => '/storage/products/soda-cream.jpg',
+                'image' => 'products/soda-cream.jpg',
                 'price' => 70000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -172,7 +172,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'com-trung-chien',
                 'name' => 'Cơm trứng chiên',
-                'image' => '/storage/products/com-trung-chien.jpg',
+                'image' => 'products/com-trung-chien.jpg',
                 'price' => 35000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -185,7 +185,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'canh-ga-chien',
                 'name' => 'Cánh Gà Chiên',
-                'image' => '/storage/products/canh-ga-chien.jpg',
+                'image' => 'products/canh-ga-chien.jpg',
                 'price' => 40000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -198,7 +198,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'com-phan',
                 'name' => 'Cơm phần',
-                'image' => '/storage/products/com-phan.jpg',
+                'image' => 'products/com-phan.jpg',
                 'price' => 70000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -211,7 +211,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'bo-ham',
                 'name' => 'Bò Hầm',
-                'image' => '/storage/products/bo-ham.jpg',
+                'image' => 'products/bo-ham.jpg',
                 'price' => 50000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
@@ -224,7 +224,7 @@ class ProductSeeder extends Seeder
             [
                 'slug' => 'mi-spaghetti-pho-mai',
                 'name' => 'Mì spaghetti Phô Mai',
-                'image' => '/storage/products/mi-spaghetti-pho-mai.jpg',
+                'image' => 'products/mi-spaghetti-pho-mai.jpg',
                 'price' => 50000,
                 'sale_price' => NULL,
                 'sale_start_at' => NULL,
