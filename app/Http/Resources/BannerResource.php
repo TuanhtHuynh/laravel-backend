@@ -7,14 +7,23 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class BannerResource extends JsonResource
 {
-    /**
-     * @return array<string, mixed>
-     */
     public function toArray(Request $request): array
     {
+        $imagePath = $this->image;
+        $finalImageUrl = null;
+
+        if ($imagePath) {
+            if (str_starts_with($imagePath, 'http')) {
+                $finalImageUrl = $imagePath;
+            } else {
+                $cleanPath = preg_replace('/^\/?(storage\/)?/', '', $imagePath);
+                $finalImageUrl = asset('storage/' . $cleanPath);
+            }
+        }
+
         return [
             'id' => $this->id,
-            'image' => $this->image ? (str_starts_with($this->image, 'http') ? $this->image : config('app.url') . $this->image) : null,
+            'image' => $finalImageUrl,
             'title' => $this->title,
             'link_url' => $this->link_url,
             'sort_order' => $this->sort_order,
