@@ -53,6 +53,13 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## Auth / JWT
+
+- Login (`POST /api/auth/login`) trả JSON chứa `token`, `user`, `role`, `permissions`. Không dùng cookie.
+- FE React lưu dữ liệu vào `localStorage` qua `resources/js/authStorage.js`.
+- Middleware `CookieJwt` hỗ trợ `Authorization: Bearer ...` từ header.
+- Đảm bảo UTF-8 cho nội dung tiếng Việt trong file JS và PHP.
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

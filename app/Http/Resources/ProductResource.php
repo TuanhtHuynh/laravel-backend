@@ -16,7 +16,7 @@ class ProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'image' => $this->image ? Storage::url(ltrim(str_replace('/storage/', '', $this->image), '/')) : null,
+            'image' => $this->image ? rtrim(config('app.url', env('APP_URL', 'http://localhost:8000')), '/') . '/' . ltrim($this->image, '/') : null,
             'slug' => $this->slug,
             'price' => $this->price,
             'sale_price' => $this->sale_price,
