@@ -35,7 +35,7 @@ class AuthController extends Controller
             'user' => (new UserResource($user->load(['staff.role', 'staff.store'])))->resolve(),
             'role' => $user->staff->role->slug ?? null,
             'permissions' => $this->permissions($user),
-        ])->withCookie('jwt_token', $token, 60 * 24, '/', null, true, true, 'None');
+        ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
     }
 
     public function me(Request $request): JsonResponse
@@ -70,7 +70,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng xuất thành công.',
-        ])->withCookie('jwt_token', null, -1, '/', null, true, true, 'None');
+        ], 200, ['Content-Type' => 'application/json; charset=utf-8']);
     }
 
     private function userResource(Request $request): array
