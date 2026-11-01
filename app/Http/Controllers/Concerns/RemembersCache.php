@@ -16,7 +16,7 @@ trait RemembersCache
     /**
      * @var list<string>
      */
-    private const CACHE_RESOURCES = ['products', 'categories', 'sizes', 'ingredients', 'stores', 'search'];
+    private const CACHE_RESOURCES = ['products', 'categories', 'sizes', 'ingredients', 'stores', 'search', 'banners'];
 
     protected function rememberCached(string $resource, string $key, Closure $callback): mixed
     {
