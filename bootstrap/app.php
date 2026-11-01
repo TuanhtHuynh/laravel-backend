@@ -16,17 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies('*', \Illuminate\Http\Request::HEADER_X_FORWARDED_ALL);
+        $middleware->trustProxies('*');
         $middleware->alias([
             'role' => EnsureStaffHasRole::class,
             'store.scope' => EnsureStoreScope::class,
             'cookie.jwt' => CookieJwt::class,
         ]);
 
-        // JWT cookie: đọc cookie jwt_token -> Authorization Bearer cho api.
+        // JWT cookie: Ä‘á»c cookie jwt_token -> Authorization Bearer cho api.
         $middleware->prependToGroup('api', CookieJwt::class);
 
-        // API không có trang login: trả 401 JSON thay vì redirect.
+        // API khÃ´ng cÃ³ trang login: tráº£ 401 JSON thay vÃ¬ redirect.
         $middleware->redirectGuestsTo(
             fn (Request $request) => $request->is('api/*') ? null : '/login'
         );
