@@ -15,7 +15,7 @@ class BannerRequest extends FormRequest
         $required = $banner !== null ? 'sometimes' : 'required';
 
         return [
-            'image' => [$required, 'string', 'max:255'],
+            'image' => [$required, 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'title' => ['nullable', 'string', 'max:255'],
             'link_url' => ['nullable', 'string', 'max:1000'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

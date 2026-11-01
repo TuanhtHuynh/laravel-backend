@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\SearchRequest;
 use App\Http\Resources\BannerResource;
 use App\Models\Banner;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -45,6 +46,10 @@ class BannerController extends Controller
         $data = $request->validated();
         $data['sort_order'] ??= (int) Banner::query()->max('sort_order') + 1;
 
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('banners', 'public');
+        }
+
         $banner = Banner::create($data);
 
         return (new BannerResource($banner))->response()->setStatusCode(201);
@@ -57,13 +62,26 @@ class BannerController extends Controller
 
     public function update(BannerRequest $request, Banner $banner): JsonResponse
     {
-        $banner->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            if ($banner->image) {
+                Storage::disk('public')->delete($banner->image);
+            }
+            $data['image'] = $request->file('image')->store('banners', 'public');
+        }
+
+        $banner->update($data);
 
         return (new BannerResource($banner->fresh()))->response();
     }
 
     public function destroy(Banner $banner): JsonResponse
     {
+        if ($banner->image) {
+            Storage::disk('public')->delete($banner->image);
+        }
+
         $banner->delete();
 
         return response()->json(['message' => 'Đã xóa banner.']);
