@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://foodsg-backend.onrender.com'],
+    'allowed_origins' => ['https://food-sg-frontend.onrender.com'],
 
     'allowed_origins_patterns' => [],
 
