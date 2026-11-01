@@ -14,7 +14,7 @@ class BannerResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'image' => $this->image,
+            'image' => $this->image ? (str_starts_with($this->image, 'http') ? $this->image : config('app.url') . $this->image) : null,
             'title' => $this->title,
             'link_url' => $this->link_url,
             'sort_order' => $this->sort_order,
