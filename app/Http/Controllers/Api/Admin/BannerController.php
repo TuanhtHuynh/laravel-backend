@@ -54,7 +54,9 @@ class BannerController extends Controller
         $data['sort_order'] ??= (int) Banner::query()->max('sort_order') + 1;
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('banners', 'public');
+            $uploadResponse = $this->uploadImage($request);
+            $uploadData = $uploadResponse->getData(true);
+            $data['image'] = $uploadData['url'] ?? null;
         }
 
         $banner = Banner::create($data);
@@ -73,12 +75,9 @@ class BannerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            // (Tuỳ chọn) Bạn có thể code thêm đoạn xóa file cũ trong storage nếu muốn dọn ổ đĩa
-            if ($banner->image) {
-                Storage::disk('public')->delete($banner->image);
-            }
-            // Laravel tự sinh tên ngẫu nhiên cho file mới
-            $data['image'] = $request->file('image')->store('banners', 'public');
+            $uploadResponse = $this->uploadImage($request);
+            $uploadData = $uploadResponse->getData(true);
+            $data['image'] = $uploadData['url'] ?? null;
         }
 
         $banner->update($data);
@@ -89,10 +88,6 @@ class BannerController extends Controller
 
     public function destroy(Banner $banner): JsonResponse
     {
-        if ($banner->image) {
-            Storage::disk('public')->delete($banner->image);
-        }
-
         $banner->delete();
         $this->flushApiCache();
 

@@ -66,7 +66,9 @@ class ProductController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $uploadResponse = $this->uploadImage($request);
+            $uploadData = $uploadResponse->getData(true);
+            $data['image'] = $uploadData['url'] ?? null;
         }
 
         $product = Product::create($data);
@@ -85,10 +87,9 @@ class ProductController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $uploadResponse = $this->uploadImage($request);
+            $uploadData = $uploadResponse->getData(true);
+            $data['image'] = $uploadData['url'] ?? null;
         }
 
         $product->update($data);
@@ -117,10 +118,6 @@ class ProductController extends Controller
     public function forceDelete($id): JsonResponse
     {
         $product = Product::withTrashed()->findOrFail($id);
-
-        if ($product->image) {
-            Storage::disk('public')->delete($product->image);
-        }
 
         $product->forceDelete();
         $this->flushApiCache();
