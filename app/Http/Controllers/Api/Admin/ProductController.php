@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Http\Controllers\Concerns\HandlesImageUpload;
 use App\Http\Controllers\Concerns\RemembersCache;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductIndexRequest;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 class ProductController extends Controller
 {
     use RemembersCache;
+    use HandlesImageUpload;
 
     public function index(ProductIndexRequest $request): JsonResponse
     {
