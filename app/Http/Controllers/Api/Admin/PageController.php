@@ -8,9 +8,15 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Page::all();
+        $keyword = $request->validated('q') ?? '';
+        $pages = Page::query()
+            ->when($keyword !== '', fn ($query) => $query->where('title', 'like', "%{$keyword}%"))
+            ->latest('id')
+            ->paginate(15)
+            ->withQueryString();
+        return $pages;
     }
 
     public function store(Request $request)
