@@ -43,13 +43,13 @@ class BannerSeeder extends Seeder
                 'image' => 'banners/place.jpg',
                 'title' => 'place',
                 'link_url' => NULL,
-                'sort_order' => 0,
+                'sort_order' => 5,
             ],
             [
                 'image' => 'banners/cinamon-sugar-raisin-bg.jpg',
                 'title' => 'Dessert',
                 'link_url' => NULL,
-                'sort_order' => 0,
+                'sort_order' => 6,
             ],
         ];
 
