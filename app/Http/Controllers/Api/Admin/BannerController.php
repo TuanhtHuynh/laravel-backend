@@ -73,6 +73,7 @@ class BannerController extends Controller
     public function update(BannerRequest $request, Banner $banner): JsonResponse
     {
         $data = $request->validated();
+        $data['sort_order'] ??= (int) Banner::query()->max('sort_order') + 1;
 
         if ($request->hasFile('image')) {
             $uploadResponse = $this->uploadImage($request);
