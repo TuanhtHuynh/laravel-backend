@@ -13,7 +13,7 @@ class PageSeeder extends Seeder
             ['slug' => 'gioi-thieu'],
             [
                 'title' => 'Giới thiệu',
-                'content' => '<p>Food-SG — hệ thống quản lý thực phẩm và cửa hàng.</p>',
+                'content' => '<p>Food SG — Developed a food management system for managing food, staff, stores, and products.</p>',
             ]
         );
     }
